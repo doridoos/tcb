@@ -1,7 +1,7 @@
 {
-  "name": "Time Check Buddy v2.0",
+  "name": "Time Check Buddy v2.1",
   "short_name": "TimeCheck",
-  "description": "Professional PWA with inline editing - Click to edit times and memos instantly",
+  "description": "Professional PWA with modal editing - Beautiful popup dialogs for seamless editing",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",

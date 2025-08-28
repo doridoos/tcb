@@ -455,6 +455,175 @@
       opacity: 1;
     }
     
+    /* 시간 편집 모달 */
+    .time-edit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    .time-edit-modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .time-edit-content {
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+      border-radius: 20px;
+      padding: 25px 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      max-width: 320px;
+      width: 85%;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    /* 모바일에서 더 작은 패딩 */
+    @media (max-width: 480px) {
+      .time-edit-content {
+        padding: 20px 18px;
+        max-width: 300px;
+        width: 90%;
+      }
+    }
+    
+    .time-edit-modal.show .time-edit-content {
+      transform: scale(1);
+    }
+    
+    .time-edit-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .time-edit-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    
+    .time-edit-subtitle {
+      font-size: 14px;
+      color: var(--muted-2);
+    }
+    
+    .time-input-container {
+      text-align: center;
+      margin: 25px 0;
+    }
+    
+    .time-input-large {
+      font-size: 24px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      color: #fff;
+      text-align: center;
+      padding: 12px 20px;
+      width: 160px;
+      max-width: 90%;
+      outline: none;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      min-width: 160px;
+    }
+    
+    /* 모바일에서 더 작은 크기 */
+    @media (max-width: 480px) {
+      .time-input-large {
+        font-size: 20px;
+        width: 150px;
+        min-width: 150px;
+        padding: 10px 16px;
+      }
+    }
+    
+    .time-input-large:focus {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.6);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    
+    .time-edit-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+    
+    .time-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .time-btn-save {
+      background: var(--success);
+      color: #fff;
+    }
+    
+    .time-btn-save:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+    
+    .time-btn-cancel {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 1px solid var(--border);
+    }
+    
+    .time-btn-cancel:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+    
+    .memo-input-large {
+      width: 100%;
+      font-size: 16px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      color: #fff;
+      padding: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    
+    .memo-input-large:focus {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.6);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    
+    .memo-input-large::placeholder {
+      color: var(--muted-2);
+    }
+    
     .memo-edit-btn {
       background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.28);
@@ -825,7 +994,7 @@
   
   <!-- Copyright -->
   <footer style="text-align: center; margin-top: 30px; padding: 20px 0; color: rgba(255,255,255,0.6); font-size: 12px;">
-    © 2025 Time Check Buddy v2.0 by doridoos. All rights reserved.
+    © 2025 Time Check Buddy v2.1 by doridoos. All rights reserved.
   </footer>
 </div>
 
@@ -862,6 +1031,44 @@
 
 <!-- 파일 입력 (숨김) -->
 <input type="file" id="fileInput" accept=".csv" style="display: none;">
+
+<!-- 시간 편집 모달 -->
+<div class="time-edit-modal" id="timeEditModal">
+  <div class="time-edit-content">
+    <div class="time-edit-header">
+      <div class="time-edit-title" id="timeEditTitle">⏰ 시간 수정</div>
+      <div class="time-edit-subtitle" id="timeEditSubtitle">정확한 시간을 입력하세요</div>
+    </div>
+    
+    <div class="time-input-container">
+      <input type="time" class="time-input-large" id="timeInputLarge" step="60">
+    </div>
+    
+    <div class="time-edit-buttons">
+      <button class="time-btn time-btn-cancel" id="timeBtnCancel">취소</button>
+      <button class="time-btn time-btn-save" id="timeBtnSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메모 편집 모달 -->
+<div class="time-edit-modal" id="memoEditModal">
+  <div class="time-edit-content">
+    <div class="time-edit-header">
+      <div class="time-edit-title" id="memoEditTitle">✏️ 메모 수정</div>
+      <div class="time-edit-subtitle" id="memoEditSubtitle">특별한 사항을 기록하세요</div>
+    </div>
+    
+    <div class="time-input-container">
+      <textarea class="memo-input-large" id="memoInputLarge" placeholder="메모를 입력하세요..." rows="4"></textarea>
+    </div>
+    
+    <div class="time-edit-buttons">
+      <button class="time-btn time-btn-cancel" id="memoBtnCancel">취소</button>
+      <button class="time-btn time-btn-save" id="memoBtnSave">저장</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // 전역 변수
@@ -902,6 +1109,22 @@ const clearAllData = document.getElementById("clearAllData");
 const showHelp = document.getElementById("showHelp");
 const showInfo = document.getElementById("showInfo");
 const fileInput = document.getElementById("fileInput");
+
+// 시간 편집 모달 요소들
+const timeEditModal = document.getElementById("timeEditModal");
+const timeEditTitle = document.getElementById("timeEditTitle");
+const timeEditSubtitle = document.getElementById("timeEditSubtitle");
+const timeInputLarge = document.getElementById("timeInputLarge");
+const timeBtnCancel = document.getElementById("timeBtnCancel");
+const timeBtnSave = document.getElementById("timeBtnSave");
+
+// 메모 편집 모달 요소들
+const memoEditModal = document.getElementById("memoEditModal");
+const memoEditTitle = document.getElementById("memoEditTitle");
+const memoEditSubtitle = document.getElementById("memoEditSubtitle");
+const memoInputLarge = document.getElementById("memoInputLarge");
+const memoBtnCancel = document.getElementById("memoBtnCancel");
+const memoBtnSave = document.getElementById("memoBtnSave");
 
 // 시간 업데이트 함수
 function updateTime() {
@@ -967,6 +1190,37 @@ function recordTime(type) {
   displayRecords();
 }
 
+// 시간 형식 변환 함수들
+function format12Hour(time24) {
+  if (!time24) return "";
+  
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours);
+  const ampm = hour < 12 ? '오전' : '오후';
+  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  
+  return `${ampm} ${hour12}:${minutes}`;
+}
+
+function format24Hour(time12) {
+  if (!time12) return "";
+  
+  // "오전 9:30" 또는 "오후 2:15" 형식 파싱
+  const match = time12.match(/(오전|오후)\s*(\d{1,2}):(\d{2})/);
+  if (!match) return time12; // 이미 24시간 형식인 경우 그대로 반환
+  
+  const [, ampm, hour, minute] = match;
+  let hour24 = parseInt(hour);
+  
+  if (ampm === '오후' && hour24 !== 12) {
+    hour24 += 12;
+  } else if (ampm === '오전' && hour24 === 12) {
+    hour24 = 0;
+  }
+  
+  return `${hour24.toString().padStart(2, '0')}:${minute}`;
+}
+
 // 기록 삭제 함수
 function deleteRecord(dateKey, type) {
   const typeText = type === "checkin" ? "출근" : "퇴근";
@@ -987,57 +1241,174 @@ function deleteRecord(dateKey, type) {
   }
 }
 
-// 시간 인라인 편집 함수
-function editTimeInline(dateKey, type, element) {
+// 전역 변수 (모달에서 사용)
+let currentEditingTime = {
+  dateKey: null,
+  type: null,
+  originalTime: null
+};
+
+let currentEditingMemo = {
+  dateKey: null,
+  type: null,
+  originalMemo: null
+};
+
+// 시간 편집 모달 함수
+function editTimeModal(dateKey, type) {
   const records = getRecords();
   const currentTime = records[dateKey]?.[type] || "";
+  const typeText = type === 'checkin' ? '출근' : '퇴근';
+  const typeIcon = type === 'checkin' ? '🏢' : '🏠';
   
-  // 입력 필드 생성
-  const input = document.createElement('input');
-  input.type = 'time';
-  input.className = 'time-input';
-  input.value = currentTime;
+  // 전역 상태 저장
+  currentEditingTime = {
+    dateKey: dateKey,
+    type: type,
+    originalTime: currentTime
+  };
   
-  // 기존 텍스트 숨기기
-  element.style.display = 'none';
-  element.parentNode.insertBefore(input, element.nextSibling);
+  // 모달 내용 설정
+  timeEditTitle.textContent = `${typeIcon} ${typeText} 시간 수정`;
+  timeEditSubtitle.textContent = `${new Date(dateKey).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', weekday: 'short'})}`;
+  
+  // 12시간 형식을 24시간 형식으로 변환해서 input에 설정
+  timeInputLarge.value = format24Hour(currentTime);
+  
+  // 모달 표시
+  timeEditModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  
+  // 입력 필드에 포커스 (약간의 지연을 두어 애니메이션 완료 후)
+  setTimeout(() => {
+    timeInputLarge.focus();
+    timeInputLarge.select();
+  }, 150);
+}
+
+// 시간 편집 모달 닫기
+function closeTimeEditModal() {
+  timeEditModal.classList.remove('show');
+  document.body.style.overflow = 'auto';
+  
+  // 상태 초기화
+  currentEditingTime = {
+    dateKey: null,
+    type: null,
+    originalTime: null
+  };
+}
+
+// 시간 저장
+function saveTimeEdit() {
+  const newTime24 = timeInputLarge.value;
+  
+  if (!newTime24) {
+    showToast("❌ 시간을 입력해주세요");
+    return;
+  }
+  
+  // 24시간 형식을 12시간 형식으로 변환
+  const newTime12 = format12Hour(newTime24);
+  
+  if (newTime12 === currentEditingTime.originalTime) {
+    closeTimeEditModal();
+    return;
+  }
+  
+  // 데이터 저장 (12시간 형식으로)
+  const records = getRecords();
+  records[currentEditingTime.dateKey][currentEditingTime.type] = newTime12;
+  setRecords(records);
+  
+  const typeText = currentEditingTime.type === 'checkin' ? '출근' : '퇴근';
+  showToast(`⏰ ${typeText} 시간이 ${newTime12}로 수정됨`);
+  
+  closeTimeEditModal();
+  displayRecords();
+}
+
+// 메모 편집 모달 함수
+function editMemoModal(dateKey, type) {
+  const records = getRecords();
+  const currentMemo = records[dateKey]?.memo?.[type] || "";
+  const typeText = type === 'checkin' ? '출근' : '퇴근';
+  const typeIcon = type === 'checkin' ? '🏢' : '🏠';
+  
+  // 전역 상태 저장
+  currentEditingMemo = {
+    dateKey: dateKey,
+    type: type,
+    originalMemo: currentMemo
+  };
+  
+  // 모달 내용 설정
+  memoEditTitle.textContent = `${typeIcon} ${typeText} 메모 수정`;
+  memoEditSubtitle.textContent = `${new Date(dateKey).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', weekday: 'short'})}`;
+  memoInputLarge.value = currentMemo;
+  
+  // 모달 표시
+  memoEditModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
   
   // 입력 필드에 포커스
-  input.focus();
-  input.select();
+  setTimeout(() => {
+    memoInputLarge.focus();
+    memoInputLarge.select();
+  }, 150);
+}
+
+// 메모 편집 모달 닫기
+function closeMemoEditModal() {
+  memoEditModal.classList.remove('show');
+  document.body.style.overflow = 'auto';
   
-  // 저장 함수
-  const saveTime = () => {
-    const newTime = input.value;
-    if (newTime && newTime !== currentTime) {
-      records[dateKey][type] = newTime;
-      setRecords(records);
-      showToast(`⏰ ${type === 'checkin' ? '출근' : '퇴근'} 시간 수정됨`);
-    }
-    
-    // 정리
-    input.remove();
-    element.style.display = 'block';
-    displayRecords();
+  // 상태 초기화
+  currentEditingMemo = {
+    dateKey: null,
+    type: null,
+    originalMemo: null
   };
+}
+
+// 메모 저장
+function saveMemoEdit() {
+  const newMemo = memoInputLarge.value.trim();
   
-  // 취소 함수
-  const cancelEdit = () => {
-    input.remove();
-    element.style.display = 'block';
-  };
+  if (newMemo === currentEditingMemo.originalMemo) {
+    closeMemoEditModal();
+    return;
+  }
   
-  // 이벤트 리스너
-  input.addEventListener('blur', saveTime);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      saveTime();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      cancelEdit();
+  // 데이터 저장
+  const records = getRecords();
+  
+  if (newMemo) {
+    if (!records[currentEditingMemo.dateKey].memo) {
+      records[currentEditingMemo.dateKey].memo = {};
     }
-  });
+    records[currentEditingMemo.dateKey].memo[currentEditingMemo.type] = newMemo;
+  } else {
+    // 빈 메모인 경우 삭제
+    if (records[currentEditingMemo.dateKey].memo) {
+      delete records[currentEditingMemo.dateKey].memo[currentEditingMemo.type];
+      if (Object.keys(records[currentEditingMemo.dateKey].memo).length === 0) {
+        delete records[currentEditingMemo.dateKey].memo;
+      }
+    }
+  }
+  
+  setRecords(records);
+  
+  const typeText = currentEditingMemo.type === 'checkin' ? '출근' : '퇴근';
+  if (newMemo) {
+    showToast(`✏️ ${typeText} 메모가 저장됨`);
+  } else {
+    showToast(`🗑️ ${typeText} 메모가 삭제됨`);
+  }
+  
+  closeMemoEditModal();
+  displayRecords();
 }
 
 // 메모 인라인 편집 함수
@@ -1222,12 +1593,12 @@ function displayRecords() {
             ${record.checkin 
               ? `<div class="time-item">
                    <span>🏢</span>
-                   <span class="time-label" onclick="editTimeInline('${dateKey}','checkin',this)">${record.checkin}</span>
+                   <span class="time-label" onclick="editTimeModal('${dateKey}','checkin')">${record.checkin}</span>
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkin')">×</button>
                  </div>
                  ${record.memo?.checkin 
                    ? `<div class="memo-container">
-                        <div class="memo-text" onclick="editMemoInline('${dateKey}','checkin',this)">${record.memo.checkin}</div>
+                        <div class="memo-text" onclick="editMemoModal('${dateKey}','checkin')">${record.memo.checkin}</div>
                       </div>` 
                    : ''}`
               : '<div class="time-item"><span>🏢</span><span class="time-label empty-time">--:--</span></div>'}
@@ -1236,12 +1607,12 @@ function displayRecords() {
             ${record.checkout 
               ? `<div class="time-item">
                    <span>🏠</span>
-                   <span class="time-label" onclick="editTimeInline('${dateKey}','checkout',this)">${record.checkout}</span>
+                   <span class="time-label" onclick="editTimeModal('${dateKey}','checkout')">${record.checkout}</span>
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkout')">×</button>
                  </div>
                  ${record.memo?.checkout 
                    ? `<div class="memo-container">
-                        <div class="memo-text" onclick="editMemoInline('${dateKey}','checkout',this)">${record.memo.checkout}</div>
+                        <div class="memo-text" onclick="editMemoModal('${dateKey}','checkout')">${record.memo.checkout}</div>
                       </div>` 
                    : ''}`
               : '<div class="time-item"><span>🏠</span><span class="time-label empty-time">--:--</span></div>'}
@@ -1445,8 +1816,9 @@ function exportToCSV() {
     csvContent += `${date},"${checkin}","${checkout}","${checkinMemo}","${checkoutMemo}"\n`;
   });
   
-  // 파일 다운로드
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  // UTF-8 BOM 추가 (엑셀 한글 호환성을 위해)
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement("a");
   const today = new Date().toISOString().split('T')[0];
   
@@ -1578,10 +1950,61 @@ showInfo.onclick = showAppInfo;
 // 파일 입력 이벤트 리스너
 fileInput.addEventListener('change', handleFileImport);
 
-// ESC 키로 메뉴 닫기
+// 시간 편집 모달 이벤트 리스너
+timeBtnSave.onclick = saveTimeEdit;
+timeBtnCancel.onclick = closeTimeEditModal;
+
+// 모달 배경 클릭으로 닫기
+timeEditModal.onclick = (e) => {
+  if (e.target === timeEditModal) {
+    closeTimeEditModal();
+  }
+};
+
+// 시간 입력 필드 엔터키 처리
+timeInputLarge.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    saveTimeEdit();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeTimeEditModal();
+  }
+});
+
+// 메모 편집 모달 이벤트 리스너
+memoBtnSave.onclick = saveMemoEdit;
+memoBtnCancel.onclick = closeMemoEditModal;
+
+// 메모 모달 배경 클릭으로 닫기
+memoEditModal.onclick = (e) => {
+  if (e.target === memoEditModal) {
+    closeMemoEditModal();
+  }
+};
+
+// 메모 입력 필드 키 처리
+memoInputLarge.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    // Ctrl+Enter로 저장
+    e.preventDefault();
+    saveMemoEdit();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeMemoEditModal();
+  }
+});
+
+// ESC 키로 메뉴/모달 닫기
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    closeMenuFunc();
+    if (timeEditModal.classList.contains('show')) {
+      closeTimeEditModal();
+    } else if (memoEditModal.classList.contains('show')) {
+      closeMemoEditModal();
+    } else {
+      closeMenuFunc();
+    }
   }
 });
 
