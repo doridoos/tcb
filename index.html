@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>출퇴근 기록기 - 개선판 v5</title>
+  <meta name="description" content="간편한 출퇴근 시간 기록 및 관리 앱">
+  <meta name="theme-color" content="#667eea">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzIiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik05NiA0OEM4MC41MzYgNDggNjggNjAuNTM2IDY4IDc2VjExNkM2OCAxMzEuNDY0IDgwLjUzNiAxNDQgOTYgMTQ0UzEyNCAxMzEuNDY0IDEyNCAxMTZWNzZDMTI0IDYwLjUzNiAxMTEuNDY0IDQ4IDk2IDQ4WiIgZmlsbD0iI0ZGRiIgZmlsbC1vcGFjaXR5PSIwLjkiLz4KPHBhdGggZD0iTTk2IDY0Qzg4LjI2OCA2NCA4MiA3MC4yNjggODIgNzhWMTE0Qzg2IDEyMS43MzIgODguMjY4IDEyOCA5NiAxMjhTMTEwIDEyMS43MzIgMTEwIDExNFY3OEMxMTAgNzAuMjY4IDEwMy43MzIgNjQgOTYgNjRaIiBmaWxsPSIjNjY3ZWVhIi8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iMTUyIiByPSI4IiBmaWxsPSIjRkZGIiBmaWxsLW9wYWNpdHk9IjAuOCIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iMTkyIiB5Mj0iMTkyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2NjdlZWEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+">
+  <style>
+    :root {
+      --bg1: #667eea;
+      --bg2: #764ba2;
+      --card: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.2);
+      --text: #fff;
+      --muted-2: rgba(255,255,255,0.55);
+      --radius: 16px;
+      --success: #4CAF50;
+      --error: #ff6b6b;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+      min-height: 100vh;
+      padding: 20px 20px 40px 20px;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding-bottom: 30px;
+      width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    
+    .current-time {
+      text-align: center;
+      font-size: clamp(28px, 7vw, 48px);
+      font-weight: 800;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .current-date {
+      text-align: center;
+      font-size: clamp(14px, 3.4vw, 18px);
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-checkin {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: #fff;
+    }
+    
+    .btn-checkout {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      color: #fff;
+    }
+    
+    .memo-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      margin: 8px 0 14px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .memo-toggle {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      padding: 6px 8px;
+      font-weight: 700;
+      transition: opacity 0.3s ease;
+    }
+    
+    .memo-toggle:hover {
+      opacity: 0.8;
+    }
+    
+    .memo-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.28s ease;
+    }
+    
+    .memo-content.show {
+      max-height: 120px;
+      margin-top: 8px;
+    }
+    
+    .memo-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .memo-input::placeholder {
+      color: var(--muted-2);
+    }
+    
+    .filter-wrap {
+      margin: 4px 0 14px;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .filter-toggle {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      padding: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    .filter-toggle:hover {
+      opacity: 0.8;
+    }
+    
+    .filter-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.28s ease;
+      background: transparent;
+      border: none;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    
+    .filter-panel.show {
+      max-height: 200px;
+      margin-top: 8px;
+    }
+    
+    .filter-inner {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    
+    .field {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      box-sizing: border-box;
+      min-width: 0;
+      overflow: hidden;
+    }
+    
+    .field.full {
+      grid-column: 1/-1;
+    }
+    
+    .filter-buttons {
+      grid-column: 1/-1;
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .field label {
+      font-size: 12px;
+      min-width: 44px;
+      font-weight: 600;
+    }
+    
+    .field input {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font-size: 14px;
+    }
+    
+    .field input::placeholder {
+      color: var(--muted-2);
+    }
+    
+    .small-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 0;
+      max-width: calc(50% - 4px);
+      white-space: nowrap;
+      box-sizing: border-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .small-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-1px);
+    }
+    
+    .records {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .records h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .record-item {
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      transition: all 0.3s ease;
+    }
+    
+    .record-item:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+    
+    .record-date {
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+      opacity: 0.9;
+    }
+    
+    .time-record {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .time-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .time-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+    
+    .time-item:hover {
+      background: rgba(255,255,255,0.12);
+    }
+    
+    .time-label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .delete-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 16px;
+      margin-left: 6px;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    
+    .delete-btn:hover {
+      background: rgba(255,255,255,0.2);
+      color: var(--error);
+    }
+    
+    .memo-container {
+      margin-top: 4px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+    }
+    
+    .memo-text {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 2px;
+      line-height: 1.4;
+    }
+    
+    .memo-edit-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.28);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+    
+    .memo-edit-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .empty-time {
+      color: var(--muted-2);
+      font-style: italic;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    
+    .pagination button {
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .pagination button:hover:not(:disabled) {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pagination .current {
+      background: var(--success);
+      font-weight: 600;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    .empty-state {
+      text-align: center;
+      opacity: 0.7;
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    .delete-all-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    .delete-all-btn:hover {
+      background: rgba(255,100,100,0.3);
+      transform: translateY(-1px);
+    }
+    
+    @media(max-width: 480px) {
+      body {
+        padding: 15px 15px 30px 15px;
+      }
+      
+      .time-label {
+        font-size: 13px;
+      }
+      
+      .field {
+        padding: 4px 6px;
+      }
+      
+      .field label {
+        min-width: 38px;
+      }
+      
+      .container {
+        padding-bottom: 40px;
+      }
+      
+      .current-time {
+        font-size: clamp(24px, 6vw, 40px);
+      }
+      
+      .current-date {
+        font-size: clamp(13px, 3vw, 16px);
+        margin-bottom: 16px;
+      }
+      
+      .controls {
+        gap: 10px;
+      }
+      
+      .btn {
+        padding: 14px;
+        font-size: 15px;
+      }
+      
+      .record-item {
+        padding: 10px;
+      }
+      
+      .filter-inner {
+        padding: 10px 8px;
+        gap: 6px;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      .field {
+        padding: 4px 6px;
+        gap: 4px;
+        min-width: 0;
+      }
+      
+      .field label {
+        min-width: 32px;
+        font-size: 11px;
+      }
+      
+      .field input {
+        font-size: 13px;
+        min-width: 0;
+      }
+      
+      .filter-buttons {
+        gap: 4px;
+        margin-top: 2px;
+        padding: 0;
+        max-width: 100%;
+      }
+      
+      .small-btn {
+        padding: 8px 2px;
+        font-size: 12px;
+        min-width: 0;
+        flex: 1;
+        max-width: calc(50% - 2px);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="current-time" id="currentTime"></div>
+  <div class="current-date" id="currentDate"></div>
+  
+  <div class="controls">
+    <button class="btn btn-checkin" id="btnCheckin">🏢 출근</button>
+    <button class="btn btn-checkout" id="btnCheckout">🏠 퇴근</button>
+  </div>
+  
+  <div class="memo-section">
+    <button class="memo-toggle" id="memoToggle">
+      <span id="memoIcon">⬇</span> 
+      <span id="memoText">메모 추가</span>
+    </button>
+    <div class="memo-content" id="memoContent">
+      <textarea class="memo-input" id="memoInput" placeholder="특별한 사항을 기록해보세요..."></textarea>
+    </div>
+  </div>
+  
+  <div class="filter-wrap">
+    <button class="filter-toggle" id="filterToggle">
+      <span id="filterIcon">⬇</span> 
+      <span id="filterText">🔎 필터 펼치기</span>
+    </button>
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-inner">
+        <div class="field">
+          <label for="dateFrom">From</label>
+          <input type="date" id="dateFrom">
+        </div>
+        <div class="field">
+          <label for="dateTo">To</label>
+          <input type="date" id="dateTo">
+        </div>
+        <div class="field full">
+          <label for="keyword">검색</label>
+          <input type="text" id="keyword" placeholder="메모 내용으로 검색">
+        </div>
+        <div class="filter-buttons">
+          <button class="small-btn" id="applyFilter">적용</button>
+          <button class="small-btn" id="resetFilter">초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="records">
+    <h3>📋 최근 기록</h3>
+    <div id="recordsList"></div>
+    <div class="pagination" id="pagination"></div>
+    <button class="delete-all-btn" onclick="clearRecords()">
+      🗑️ 전체 삭제
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 전역 변수
+let currentPage = 1;
+let recordsPerPage = 10;
+let lastAddedDate = null;
+let filterState = {from: null, to: null, q: ""};
+
+// DOM 요소들
+const currentTimeEl = document.getElementById("currentTime");
+const currentDateEl = document.getElementById("currentDate");
+const btnCheckin = document.getElementById("btnCheckin");
+const btnCheckout = document.getElementById("btnCheckout");
+const memoToggle = document.getElementById("memoToggle");
+const memoContent = document.getElementById("memoContent");
+const memoIcon = document.getElementById("memoIcon");
+const memoText = document.getElementById("memoText");
+const memoInput = document.getElementById("memoInput");
+const filterToggle = document.getElementById("filterToggle");
+const filterPanel = document.getElementById("filterPanel");
+const dateFrom = document.getElementById("dateFrom");
+const dateTo = document.getElementById("dateTo");
+const keyword = document.getElementById("keyword");
+const applyFilterBtn = document.getElementById("applyFilter");
+const resetFilterBtn = document.getElementById("resetFilter");
+const recordsList = document.getElementById("recordsList");
+const pagination = document.getElementById("pagination");
+const toast = document.getElementById("toast");
+
+// 시간 업데이트 함수
+function updateTime() {
+  const now = new Date();
+  currentTimeEl.textContent = now.toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit', 
+    second: '2-digit'
+  });
+  currentDateEl.textContent = now.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  });
+}
+
+// 로컬스토리지 관련 함수
+function getRecords() {
+  try {
+    return JSON.parse(localStorage.getItem("attendanceRecords") || "{}");
+  } catch(e) {
+    localStorage.removeItem("attendanceRecords");
+    return {};
+  }
+}
+
+function setRecords(records) {
+  localStorage.setItem("attendanceRecords", JSON.stringify(records));
+}
+
+// 출퇴근 기록 함수
+function recordTime(type) {
+  const now = new Date();
+  const dateKey = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString().split("T")[0];
+  const timeStr = now.toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  const memo = (memoInput?.value || "").trim();
+  
+  const records = getRecords();
+  if (!records[dateKey]) records[dateKey] = {};
+  
+  records[dateKey][type] = timeStr;
+  
+  if (memo) {
+    if (!records[dateKey].memo) records[dateKey].memo = {};
+    records[dateKey].memo[type] = memo;
+  }
+  
+  setRecords(records);
+  lastAddedDate = dateKey;
+  showToast(type === "checkin" ? "✅ 출근 기록됨" : "✅ 퇴근 기록됨");
+  memoInput.value = "";
+  
+  // 메모 섹션 자동 접기
+  if (memoContent.classList.contains("show")) {
+    toggleMemo();
+  }
+  
+  displayRecords();
+}
+
+// 기록 삭제 함수
+function deleteRecord(dateKey, type) {
+  const typeText = type === "checkin" ? "출근" : "퇴근";
+  if (confirm(`${typeText} 기록을 삭제하시겠습니까?`)) {
+    let records = getRecords();
+    if (records[dateKey]) {
+      delete records[dateKey][type];
+      if (records[dateKey].memo) delete records[dateKey].memo[type];
+      
+      // 출근, 퇴근 기록이 모두 없으면 날짜 자체를 삭제
+      if (!records[dateKey].checkin && !records[dateKey].checkout) {
+        delete records[dateKey];
+      }
+    }
+    setRecords(records);
+    showToast("🗑️ 삭제됨");
+    displayRecords();
+  }
+}
+
+// 메모 수정 함수
+function editMemo(dateKey, type) {
+  let records = getRecords();
+  const currentMemo = records[dateKey]?.memo?.[type] || "";
+  const typeText = type === "checkin" ? "출근" : "퇴근";
+  const newMemo = prompt(`${typeText} 메모 수정:`, currentMemo);
+  
+  if (newMemo !== null) {
+    if (!records[dateKey].memo) records[dateKey].memo = {};
+    
+    if (newMemo.trim()) {
+      records[dateKey].memo[type] = newMemo.trim();
+    } else {
+      delete records[dateKey].memo[type];
+      if (Object.keys(records[dateKey].memo).length === 0) {
+        delete records[dateKey].memo;
+      }
+    }
+    
+    setRecords(records);
+    showToast("✏️ 메모 수정됨");
+    displayRecords();
+  }
+}
+
+// 필터 관련 함수
+function applyFilter() {
+  filterState = {
+    from: dateFrom.value || null,
+    to: dateTo.value || null,
+    q: keyword.value.trim().toLowerCase()
+  };
+  currentPage = 1;
+  displayRecords();
+  showToast("🔍 필터 적용됨");
+}
+
+function resetFilter() {
+  dateFrom.value = "";
+  dateTo.value = "";
+  keyword.value = "";
+  filterState = {from: null, to: null, q: ""};
+  currentPage = 1;
+  displayRecords();
+  showToast("🔄 필터 초기화됨");
+}
+
+function dateInRange(dateKey) {
+  if (!filterState.from && !filterState.to) return true;
+  if (filterState.from && dateKey < filterState.from) return false;
+  if (filterState.to && dateKey > filterState.to) return false;
+  return true;
+}
+
+function matchKeyword(dateKey, record) {
+  const query = filterState.q;
+  if (!query) return true;
+  
+  const weekday = new Date(dateKey).toLocaleDateString('ko-KR', {weekday: 'long'}).toLowerCase();
+  const searchableText = [
+    weekday,
+    (record.checkin || "").toLowerCase(),
+    (record.checkout || "").toLowerCase(),
+    (record.memo?.checkin || "").toLowerCase(),
+    (record.memo?.checkout || "").toLowerCase()
+  ].join(" ");
+  
+  return searchableText.includes(query);
+}
+
+// 기록 표시 함수
+function displayRecords() {
+  const records = getRecords();
+  const allDates = Object.keys(records).sort().reverse();
+  const filteredDates = allDates.filter(dateKey => 
+    dateInRange(dateKey) && matchKeyword(dateKey, records[dateKey])
+  );
+  
+  if (filteredDates.length === 0) {
+    recordsList.innerHTML = '<div class="empty-state">기록이 없습니다</div>';
+    pagination.innerHTML = "";
+    return;
+  }
+  
+  const totalPages = Math.ceil(filteredDates.length / recordsPerPage);
+  if (currentPage > totalPages) currentPage = totalPages;
+  
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+  const currentPageDates = filteredDates.slice(startIndex, endIndex);
+  
+  recordsList.innerHTML = currentPageDates.map(dateKey => {
+    const record = records[dateKey];
+    const displayDate = new Date(dateKey).toLocaleDateString('ko-KR', {
+      month: 'short',
+      day: 'numeric',
+      weekday: 'short'
+    });
+    
+    return `
+      <div class="record-item">
+        <div class="record-date">${displayDate}</div>
+        <div class="time-record">
+          <div class="time-group">
+            ${record.checkin 
+              ? `<div class="time-item">
+                   <span>🏢</span>
+                   <span class="time-label">${record.checkin}</span>
+                   <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkin')">×</button>
+                 </div>
+                 ${record.memo?.checkin 
+                   ? `<div class="memo-container">
+                        <div class="memo-text">${record.memo.checkin}</div>
+                        <button class="memo-edit-btn" onclick="editMemo('${dateKey}','checkin')">수정</button>
+                      </div>` 
+                   : ''}`
+              : '<div class="time-item"><span>🏢</span><span class="time-label empty-time">--:--</span></div>'}
+          </div>
+          <div class="time-group">
+            ${record.checkout 
+              ? `<div class="time-item">
+                   <span>🏠</span>
+                   <span class="time-label">${record.checkout}</span>
+                   <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkout')">×</button>
+                 </div>
+                 ${record.memo?.checkout 
+                   ? `<div class="memo-container">
+                        <div class="memo-text">${record.memo.checkout}</div>
+                        <button class="memo-edit-btn" onclick="editMemo('${dateKey}','checkout')">수정</button>
+                      </div>` 
+                   : ''}`
+              : '<div class="time-item"><span>🏠</span><span class="time-label empty-time">--:--</span></div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+  
+  // 페이지네이션 생성
+  if (totalPages > 1) {
+    let paginationHTML = "";
+    
+    // 이전 버튼
+    paginationHTML += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>◀</button>`;
+    
+    // 페이지 번호들
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+      paginationHTML += `<button onclick="changePage(1)">1</button>`;
+      if (startPage > 2) paginationHTML += `<span>...</span>`;
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      paginationHTML += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="current"' : ''}>${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) paginationHTML += `<span>...</span>`;
+      paginationHTML += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    // 다음 버튼
+    paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>▶</button>`;
+    
+    pagination.innerHTML = paginationHTML;
+  } else {
+    pagination.innerHTML = "";
+  }
+}
+
+// 페이지 변경 함수
+function changePage(page) {
+  const records = getRecords();
+  const allDates = Object.keys(records).sort().reverse();
+  const filteredDates = allDates.filter(dateKey => 
+    dateInRange(dateKey) && matchKeyword(dateKey, records[dateKey])
+  );
+  const totalPages = Math.ceil(filteredDates.length / recordsPerPage);
+  
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    displayRecords();
+  }
+}
+
+// 토스트 메시지 함수
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+// 전체 삭제 함수
+function clearRecords() {
+  if (confirm("모든 기록을 삭제하시겠습니까?")) {
+    localStorage.removeItem("attendanceRecords");
+    currentPage = 1;
+    displayRecords();
+    showToast("🗑️ 모든 기록 삭제됨");
+  }
+}
+
+// 메모 토글 함수
+function toggleMemo() {
+  if (memoContent.classList.contains("show")) {
+    memoContent.classList.remove("show");
+    memoIcon.textContent = "⬇";
+    memoText.textContent = "메모 추가";
+  } else {
+    memoContent.classList.add("show");
+    memoIcon.textContent = "⬆";
+    memoText.textContent = "메모 접기";
+    setTimeout(() => memoInput.focus(), 200);
+  }
+}
+
+// 필터 토글 함수
+function toggleFilter() {
+  const filterIcon = document.getElementById("filterIcon");
+  const filterText = document.getElementById("filterText");
+  
+  if (filterPanel.classList.contains("show")) {
+    filterPanel.classList.remove("show");
+    filterIcon.textContent = "⬇";
+    filterText.textContent = "🔎 필터 펼치기";
+  } else {
+    filterPanel.classList.add("show");
+    filterIcon.textContent = "⬆";
+    filterText.textContent = "🔎 필터 접기";
+  }
+}
+
+// 이벤트 리스너 등록
+btnCheckin.onclick = () => recordTime("checkin");
+btnCheckout.onclick = () => recordTime("checkout");
+memoToggle.onclick = toggleMemo;
+filterToggle.onclick = toggleFilter;
+applyFilterBtn.onclick = applyFilter;
+resetFilterBtn.onclick = resetFilter;
+
+// 엔터키로 필터 적용
+keyword.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    applyFilter();
+  }
+});
+
+// 오프라인/온라인 상태 감지
+function handleOnlineStatus() {
+  if (navigator.onLine) {
+    showToast('🌐 온라인 상태');
+  } else {
+    showToast('📱 오프라인 모드 (데이터는 로컬에 저장됩니다)');
+  }
+}
+
+window.addEventListener('online', () => {
+  showToast('🌐 인터넷 연결됨');
+});
+
+window.addEventListener('offline', () => {
+  showToast('📱 오프라인 모드');
+});
+
+// 초기화
+updateTime();
+setInterval(updateTime, 1000);
+displayRecords();
+
+// 초기 온라인 상태 확인
+if (!navigator.onLine) {
+  setTimeout(() => {
+    showToast('📱 오프라인 모드 - 모든 기능이 정상 작동합니다');
+  }, 1000);
+}
+
+// PWA를 위한 서비스 워커 등록
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('✅ Service Worker registered successfully:', registration.scope);
+        
+        // 업데이트 확인
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // 새 버전 사용 가능 알림
+              if (confirm('새 버전이 있습니다. 업데이트하시겠습니까?')) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(error => {
+        console.error('❌ Service Worker registration failed:', error);
+      });
+  });
+  
+  // 서비스 워커 제어권 변경 감지
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('🔄 Service Worker controller changed');
+  });
+}
+</script>
+</body>
+</html>
