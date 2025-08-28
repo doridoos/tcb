@@ -1,7 +1,7 @@
 {
-  "name": "출퇴근 기록기",
-  "short_name": "출퇴근",
-  "description": "간편한 출퇴근 시간 기록 및 관리 앱",
+  "name": "Time Check Buddy",
+  "short_name": "TimeCheck",
+  "description": "Professional PWA for attendance tracking with complete offline support and data backup features",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",

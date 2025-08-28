@@ -1,4 +1,4 @@
-const CACHE_NAME = 'attendance-tracker-v2';
+const CACHE_NAME = 'time-check-buddy-final';
 const urlsToCache = [
   './',
   './index.html',

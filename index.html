@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>출퇴근 기록기 - 개선판 v5</title>
+  <title>Time Check Buddy</title>
   <meta name="description" content="간편한 출퇴근 시간 기록 및 관리 앱">
   <meta name="theme-color" content="#667eea">
   <link rel="manifest" href="/manifest.json">
@@ -43,14 +43,54 @@
       width: 100%;
       box-sizing: border-box;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    .header {
+      position: relative;
+      margin-bottom: 6px;
     }
     
     .current-time {
       text-align: center;
-      font-size: clamp(28px, 7vw, 48px);
+      font-size: clamp(36px, 10vw, 64px);
       font-weight: 800;
-      margin-bottom: 6px;
       text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+    
+    .hamburger-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 44px;
+      height: 44px;
+    }
+    
+    .hamburger-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-1px);
+    }
+    
+    .hamburger-line {
+      width: 18px;
+      height: 2px;
+      background-color: #fff;
+      margin: 1.5px 0;
+      border-radius: 2px;
+      transition: all 0.3s ease;
     }
     
     .current-date {
@@ -100,7 +140,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 8px;
+      padding: 0;
       margin: 8px 0 14px;
       backdrop-filter: blur(10px);
     }
@@ -111,9 +151,15 @@
       border: 0;
       color: #fff;
       cursor: pointer;
-      padding: 6px 8px;
+      padding: 8px 16px;
       font-weight: 700;
       transition: opacity 0.3s ease;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      border-radius: 12px;
     }
     
     .memo-toggle:hover {
@@ -128,7 +174,8 @@
     
     .memo-content.show {
       max-height: 120px;
-      margin-top: 8px;
+      margin-top: 0;
+      padding: 0 12px 12px 12px;
     }
     
     .memo-input {
@@ -154,6 +201,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       backdrop-filter: blur(10px);
+      padding: 0;
     }
     
     .filter-toggle {
@@ -161,11 +209,16 @@
       background: transparent;
       border: 0;
       color: #fff;
-      padding: 8px;
+      padding: 8px 16px;
       font-weight: 700;
       cursor: pointer;
       transition: opacity 0.3s ease;
       box-sizing: border-box;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
     }
     
     .filter-toggle:hover {
@@ -184,7 +237,7 @@
     
     .filter-panel.show {
       max-height: 200px;
-      margin-top: 8px;
+      margin-top: 0;
     }
     
     .filter-inner {
@@ -440,6 +493,115 @@
       opacity: 1;
     }
     
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+      backdrop-filter: blur(20px);
+      z-index: 9999;
+      transition: right 0.3s ease;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+      overflow-y: auto;
+    }
+    
+    .side-menu.show {
+      right: 0;
+    }
+    
+    .menu-header {
+      padding: 30px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .menu-header h3 {
+      color: #fff;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    
+    .menu-header p {
+      color: var(--muted-2);
+      font-size: 14px;
+    }
+    
+    .close-menu {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .close-menu:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .menu-items {
+      padding: 20px 0;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 25px;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 16px;
+    }
+    
+    .menu-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .menu-item.danger:hover {
+      background: rgba(255,100,100,0.2);
+    }
+    
+    .menu-item span {
+      margin-right: 12px;
+      font-size: 18px;
+    }
+    
+    .menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 20px;
+    }
+    
     .empty-state {
       text-align: center;
       opacity: 0.7;
@@ -488,8 +650,24 @@
         padding-bottom: 40px;
       }
       
+      .hamburger-btn {
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+      }
+      
+      .hamburger-line {
+        width: 16px;
+        height: 2px;
+      }
+      
+      .side-menu {
+        width: 100vw;
+        right: -100vw;
+      }
+      
       .current-time {
-        font-size: clamp(24px, 6vw, 40px);
+        font-size: clamp(32px, 9vw, 56px);
       }
       
       .current-date {
@@ -552,7 +730,14 @@
 </head>
 <body>
 <div class="container">
-  <div class="current-time" id="currentTime"></div>
+  <div class="header">
+    <div class="current-time" id="currentTime"></div>
+    <button class="hamburger-btn" id="hamburgerBtn">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
   <div class="current-date" id="currentDate"></div>
   
   <div class="controls">
@@ -562,8 +747,8 @@
   
   <div class="memo-section">
     <button class="memo-toggle" id="memoToggle">
-      <span id="memoIcon">⬇</span> 
-      <span id="memoText">메모 추가</span>
+      <span id="memoText">✏️ 메모 추가</span>
+      <span id="memoIcon"> ▼</span>
     </button>
     <div class="memo-content" id="memoContent">
       <textarea class="memo-input" id="memoInput" placeholder="특별한 사항을 기록해보세요..."></textarea>
@@ -572,8 +757,8 @@
   
   <div class="filter-wrap">
     <button class="filter-toggle" id="filterToggle">
-      <span id="filterIcon">⬇</span> 
       <span id="filterText">🔎 필터 펼치기</span>
+      <span id="filterIcon"> ▼</span>
     </button>
     <div class="filter-panel" id="filterPanel">
       <div class="filter-inner">
@@ -601,13 +786,48 @@
     <h3>📋 최근 기록</h3>
     <div id="recordsList"></div>
     <div class="pagination" id="pagination"></div>
-    <button class="delete-all-btn" onclick="clearRecords()">
-      🗑️ 전체 삭제
+
+  </div>
+  
+  <!-- Copyright -->
+  <footer style="text-align: center; margin-top: 30px; padding: 20px 0; color: rgba(255,255,255,0.6); font-size: 12px;">
+    © 2025 Time Check Buddy by doridoos. All rights reserved.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 햄버거 메뉴 -->
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="menu-header">
+    <button class="close-menu" id="closeMenu">&times;</button>
+    <h3>Time Check Buddy</h3>
+    <p>데이터 관리 및 설정</p>
+  </div>
+  <div class="menu-items">
+    <button class="menu-item" id="exportData">
+      <span>📤</span>데이터 내보내기
+    </button>
+    <button class="menu-item" id="importData">
+      <span>📥</span>데이터 가져오기
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item danger" id="clearAllData">
+      <span>🗑️</span>전체 삭제
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" id="showHelp">
+      <span>❓</span>도움말
+    </button>
+    <button class="menu-item" id="showInfo">
+      <span>ℹ️</span>앱 정보
     </button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- 파일 입력 (숨김) -->
+<input type="file" id="fileInput" accept=".csv" style="display: none;">
 
 <script>
 // 전역 변수
@@ -636,6 +856,18 @@ const resetFilterBtn = document.getElementById("resetFilter");
 const recordsList = document.getElementById("recordsList");
 const pagination = document.getElementById("pagination");
 const toast = document.getElementById("toast");
+
+// 햄버거 메뉴 요소들
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const menuOverlay = document.getElementById("menuOverlay");
+const sideMenu = document.getElementById("sideMenu");
+const closeMenu = document.getElementById("closeMenu");
+const exportData = document.getElementById("exportData");
+const importData = document.getElementById("importData");
+const clearAllData = document.getElementById("clearAllData");
+const showHelp = document.getElementById("showHelp");
+const showInfo = document.getElementById("showInfo");
+const fileInput = document.getElementById("fileInput");
 
 // 시간 업데이트 함수
 function updateTime() {
@@ -917,24 +1149,84 @@ function showToast(message) {
 
 // 전체 삭제 함수
 function clearRecords() {
-  if (confirm("모든 기록을 삭제하시겠습니까?")) {
+  if (confirm("⚠️ 모든 기록을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.")) {
     localStorage.removeItem("attendanceRecords");
     currentPage = 1;
     displayRecords();
     showToast("🗑️ 모든 기록 삭제됨");
+    closeMenuFunc();
   }
+}
+
+// 도움말 표시
+function showHelpDialog() {
+  const helpText = `📱 Time Check Buddy 사용법
+
+✅ 기본 기능:
+• 출근/퇴근 버튼으로 시간 기록
+• 메모 추가로 특별한 사항 기록
+• 필터로 날짜/키워드 검색
+
+💾 데이터 관리:
+• 📤 내보내기: CSV 파일로 백업
+• 📥 가져오기: CSV 파일에서 복원
+• 🗑️ 전체 삭제: 모든 데이터 삭제
+
+🔍 고급 기능:
+• 페이지네이션으로 대량 기록 관리
+• 오프라인 완전 지원
+• PWA로 앱처럼 설치 가능
+
+💡 팁:
+• 데이터는 기기에 안전하게 저장
+• 정기적으로 백업하세요
+• 홈 화면에 추가해서 사용하세요`;
+
+  alert(helpText);
+  closeMenuFunc();
+}
+
+// 앱 정보 표시
+function showAppInfo() {
+  const records = getRecords();
+  const totalDays = Object.keys(records).length;
+  const appVersion = "Final Edition";
+  const lastUpdate = "2025-08-28";
+  
+  const infoText = `ℹ️ Time Check Buddy ${appVersion}
+
+📊 현재 상태:
+• 총 기록 일수: ${totalDays}일
+• 앱 버전: ${appVersion}
+• 마지막 업데이트: ${lastUpdate}
+
+🛠️ 기술 스택:
+• Progressive Web App (PWA)
+• 완전한 오프라인 지원
+• 로컬스토리지 데이터 저장
+
+🔐 개인정보 보호:
+• 모든 데이터는 기기에만 저장
+• 외부 서버 전송 없음
+• 완전한 프라이버시 보장
+
+💡 Created by doridoos
+🌟 오픈소스 프로젝트`;
+
+  alert(infoText);
+  closeMenuFunc();
 }
 
 // 메모 토글 함수
 function toggleMemo() {
   if (memoContent.classList.contains("show")) {
     memoContent.classList.remove("show");
-    memoIcon.textContent = "⬇";
-    memoText.textContent = "메모 추가";
+    memoIcon.textContent = " ▼";
+    memoText.textContent = "✏️ 메모 추가";
   } else {
     memoContent.classList.add("show");
-    memoIcon.textContent = "⬆";
-    memoText.textContent = "메모 접기";
+    memoIcon.textContent = " ▲";
+    memoText.textContent = "✏️ 메모 접기";
     setTimeout(() => memoInput.focus(), 200);
   }
 }
@@ -946,13 +1238,161 @@ function toggleFilter() {
   
   if (filterPanel.classList.contains("show")) {
     filterPanel.classList.remove("show");
-    filterIcon.textContent = "⬇";
+    filterIcon.textContent = " ▼";
     filterText.textContent = "🔎 필터 펼치기";
   } else {
     filterPanel.classList.add("show");
-    filterIcon.textContent = "⬆";
+    filterIcon.textContent = " ▲";
     filterText.textContent = "🔎 필터 접기";
   }
+}
+
+// 햄버거 메뉴 관련 함수들
+function openMenu() {
+  menuOverlay.classList.add("show");
+  sideMenu.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMenuFunc() {
+  menuOverlay.classList.remove("show");
+  sideMenu.classList.remove("show");
+  document.body.style.overflow = "auto";
+}
+
+// CSV 내보내기 함수
+function exportToCSV() {
+  const records = getRecords();
+  const dates = Object.keys(records).sort();
+  
+  if (dates.length === 0) {
+    showToast("❌ 내보낼 데이터가 없습니다");
+    return;
+  }
+  
+  // CSV 헤더
+  let csvContent = "날짜,출근시간,퇴근시간,출근메모,퇴근메모\n";
+  
+  // 데이터 행들
+  dates.forEach(date => {
+    const record = records[date];
+    const checkin = record.checkin || "";
+    const checkout = record.checkout || "";
+    const checkinMemo = record.memo?.checkin || "";
+    const checkoutMemo = record.memo?.checkout || "";
+    
+    // CSV 형식으로 변환 (쌍따옴표로 감싸서 쉼표 문제 해결)
+    csvContent += `${date},"${checkin}","${checkout}","${checkinMemo}","${checkoutMemo}"\n`;
+  });
+  
+  // 파일 다운로드
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const today = new Date().toISOString().split('T')[0];
+  
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `TimeCheckBuddy_${today}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast(`📤 ${dates.length}개 기록이 내보내짐`);
+    closeMenuFunc();
+  }
+}
+
+// CSV 가져오기 함수
+function importFromCSV() {
+  fileInput.click();
+}
+
+function handleFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    showToast("❌ CSV 파일만 지원됩니다");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const csv = e.target.result;
+      const lines = csv.split('\n');
+      
+      if (lines.length < 2) {
+        showToast("❌ 올바른 CSV 형식이 아닙니다");
+        return;
+      }
+      
+      // 헤더 확인
+      const header = lines[0].toLowerCase();
+      if (!header.includes('날짜') || !header.includes('출근') || !header.includes('퇴근')) {
+        showToast("❌ CSV 형식이 올바르지 않습니다");
+        return;
+      }
+      
+      const existingRecords = getRecords();
+      let importCount = 0;
+      let updateCount = 0;
+      
+      // 데이터 행들 처리
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // CSV 파싱 (쌍따옴표 고려)
+        const values = line.split(',').map(v => v.replace(/^"|"$/g, '').trim());
+        
+        if (values.length >= 3) {
+          const [date, checkin, checkout, checkinMemo, checkoutMemo] = values;
+          
+          // 날짜 형식 검증
+          if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            const isUpdate = existingRecords[date];
+            
+            if (!existingRecords[date]) {
+              existingRecords[date] = {};
+            }
+            
+            if (checkin) existingRecords[date].checkin = checkin;
+            if (checkout) existingRecords[date].checkout = checkout;
+            
+            if (checkinMemo || checkoutMemo) {
+              if (!existingRecords[date].memo) existingRecords[date].memo = {};
+              if (checkinMemo) existingRecords[date].memo.checkin = checkinMemo;
+              if (checkoutMemo) existingRecords[date].memo.checkout = checkoutMemo;
+            }
+            
+            isUpdate ? updateCount++ : importCount++;
+          }
+        }
+      }
+      
+      setRecords(existingRecords);
+      displayRecords();
+      
+      if (importCount > 0 || updateCount > 0) {
+        showToast(`📥 ${importCount}개 신규, ${updateCount}개 업데이트됨`);
+        closeMenuFunc();
+      } else {
+        showToast("❌ 가져올 수 있는 데이터가 없습니다");
+      }
+      
+    } catch (error) {
+      console.error('CSV 가져오기 오류:', error);
+      showToast("❌ CSV 파일 처리 중 오류가 발생했습니다");
+    }
+  };
+  
+  reader.readAsText(file, 'utf-8');
+  
+  // 파일 입력 초기화
+  event.target.value = '';
 }
 
 // 이벤트 리스너 등록
@@ -962,6 +1402,28 @@ memoToggle.onclick = toggleMemo;
 filterToggle.onclick = toggleFilter;
 applyFilterBtn.onclick = applyFilter;
 resetFilterBtn.onclick = resetFilter;
+
+// 햄버거 메뉴 이벤트 리스너
+hamburgerBtn.onclick = openMenu;
+closeMenu.onclick = closeMenuFunc;
+menuOverlay.onclick = closeMenuFunc;
+
+// 메뉴 아이템 이벤트 리스너
+exportData.onclick = exportToCSV;
+importData.onclick = importFromCSV;
+clearAllData.onclick = clearRecords;
+showHelp.onclick = showHelpDialog;
+showInfo.onclick = showAppInfo;
+
+// 파일 입력 이벤트 리스너
+fileInput.addEventListener('change', handleFileImport);
+
+// ESC 키로 메뉴 닫기
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeMenuFunc();
+  }
+});
 
 // 엔터키로 필터 적용
 keyword.addEventListener('keypress', (e) => {
