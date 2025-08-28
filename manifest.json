@@ -1,7 +1,7 @@
 {
-  "name": "Time Check Buddy",
+  "name": "Time Check Buddy v2.0",
   "short_name": "TimeCheck",
-  "description": "Professional PWA for attendance tracking with complete offline support and data backup features",
+  "description": "Professional PWA with inline editing - Click to edit times and memos instantly",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",

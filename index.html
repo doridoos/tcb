@@ -388,6 +388,31 @@
       flex: 1;
       font-size: 14px;
       font-weight: 600;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    
+    .time-label:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .time-input {
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 2px 4px;
+      outline: none;
+    }
+    
+    .time-input:focus {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.5);
     }
     
     .delete-btn {
@@ -419,6 +444,15 @@
       opacity: 0.9;
       margin-bottom: 2px;
       line-height: 1.4;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    
+    .memo-text:hover {
+      background: rgba(255,255,255,0.1);
+      opacity: 1;
     }
     
     .memo-edit-btn {
@@ -791,7 +825,7 @@
   
   <!-- Copyright -->
   <footer style="text-align: center; margin-top: 30px; padding: 20px 0; color: rgba(255,255,255,0.6); font-size: 12px;">
-    © 2025 Time Check Buddy by doridoos. All rights reserved.
+    © 2025 Time Check Buddy v2.0 by doridoos. All rights reserved.
   </footer>
 </div>
 
@@ -953,7 +987,135 @@ function deleteRecord(dateKey, type) {
   }
 }
 
-// 메모 수정 함수
+// 시간 인라인 편집 함수
+function editTimeInline(dateKey, type, element) {
+  const records = getRecords();
+  const currentTime = records[dateKey]?.[type] || "";
+  
+  // 입력 필드 생성
+  const input = document.createElement('input');
+  input.type = 'time';
+  input.className = 'time-input';
+  input.value = currentTime;
+  
+  // 기존 텍스트 숨기기
+  element.style.display = 'none';
+  element.parentNode.insertBefore(input, element.nextSibling);
+  
+  // 입력 필드에 포커스
+  input.focus();
+  input.select();
+  
+  // 저장 함수
+  const saveTime = () => {
+    const newTime = input.value;
+    if (newTime && newTime !== currentTime) {
+      records[dateKey][type] = newTime;
+      setRecords(records);
+      showToast(`⏰ ${type === 'checkin' ? '출근' : '퇴근'} 시간 수정됨`);
+    }
+    
+    // 정리
+    input.remove();
+    element.style.display = 'block';
+    displayRecords();
+  };
+  
+  // 취소 함수
+  const cancelEdit = () => {
+    input.remove();
+    element.style.display = 'block';
+  };
+  
+  // 이벤트 리스너
+  input.addEventListener('blur', saveTime);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveTime();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEdit();
+    }
+  });
+}
+
+// 메모 인라인 편집 함수
+function editMemoInline(dateKey, type, element) {
+  const records = getRecords();
+  const currentMemo = records[dateKey]?.memo?.[type] || "";
+  
+  // 입력 필드 생성
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'memo-input-inline';
+  input.value = currentMemo;
+  input.style.cssText = `
+    width: 100%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+    padding: 2px 4px;
+    outline: none;
+    margin-bottom: 2px;
+  `;
+  
+  // 기존 텍스트 숨기기
+  element.style.display = 'none';
+  element.parentNode.insertBefore(input, element);
+  
+  // 입력 필드에 포커스
+  input.focus();
+  input.select();
+  
+  // 저장 함수
+  const saveMemo = () => {
+    const newMemo = input.value.trim();
+    
+    if (newMemo !== currentMemo) {
+      if (newMemo) {
+        if (!records[dateKey].memo) records[dateKey].memo = {};
+        records[dateKey].memo[type] = newMemo;
+      } else {
+        if (records[dateKey].memo) {
+          delete records[dateKey].memo[type];
+          if (Object.keys(records[dateKey].memo).length === 0) {
+            delete records[dateKey].memo;
+          }
+        }
+      }
+      setRecords(records);
+      showToast("✏️ 메모 수정됨");
+    }
+    
+    // 정리
+    input.remove();
+    element.style.display = 'block';
+    displayRecords();
+  };
+  
+  // 취소 함수
+  const cancelEdit = () => {
+    input.remove();
+    element.style.display = 'block';
+  };
+  
+  // 이벤트 리스너
+  input.addEventListener('blur', saveMemo);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveMemo();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEdit();
+    }
+  });
+}
+
+// 기존 메모 수정 함수 (제거 예정)
 function editMemo(dateKey, type) {
   let records = getRecords();
   const currentMemo = records[dateKey]?.memo?.[type] || "";
@@ -1060,13 +1222,12 @@ function displayRecords() {
             ${record.checkin 
               ? `<div class="time-item">
                    <span>🏢</span>
-                   <span class="time-label">${record.checkin}</span>
+                   <span class="time-label" onclick="editTimeInline('${dateKey}','checkin',this)">${record.checkin}</span>
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkin')">×</button>
                  </div>
                  ${record.memo?.checkin 
                    ? `<div class="memo-container">
-                        <div class="memo-text">${record.memo.checkin}</div>
-                        <button class="memo-edit-btn" onclick="editMemo('${dateKey}','checkin')">수정</button>
+                        <div class="memo-text" onclick="editMemoInline('${dateKey}','checkin',this)">${record.memo.checkin}</div>
                       </div>` 
                    : ''}`
               : '<div class="time-item"><span>🏢</span><span class="time-label empty-time">--:--</span></div>'}
@@ -1075,13 +1236,12 @@ function displayRecords() {
             ${record.checkout 
               ? `<div class="time-item">
                    <span>🏠</span>
-                   <span class="time-label">${record.checkout}</span>
+                   <span class="time-label" onclick="editTimeInline('${dateKey}','checkout',this)">${record.checkout}</span>
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkout')">×</button>
                  </div>
                  ${record.memo?.checkout 
                    ? `<div class="memo-container">
-                        <div class="memo-text">${record.memo.checkout}</div>
-                        <button class="memo-edit-btn" onclick="editMemo('${dateKey}','checkout')">수정</button>
+                        <div class="memo-text" onclick="editMemoInline('${dateKey}','checkout',this)">${record.memo.checkout}</div>
                       </div>` 
                    : ''}`
               : '<div class="time-item"><span>🏠</span><span class="time-label empty-time">--:--</span></div>'}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'time-check-buddy-final';
+const CACHE_NAME = 'time-check-buddy-v2';
 const urlsToCache = [
   './',
   './index.html',
