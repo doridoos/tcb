@@ -432,6 +432,26 @@
       color: var(--error);
     }
     
+    .add-memo-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 4px;
+      margin-right: 2px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .add-memo-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9);
+      transform: scale(1.1);
+    }
+    
     .memo-container {
       margin-top: 4px;
       padding: 6px 8px;
@@ -642,6 +662,13 @@
     .empty-time {
       color: var(--muted-2);
       font-style: italic;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .empty-time:hover {
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.1);
     }
     
     .pagination {
@@ -1594,6 +1621,7 @@ function displayRecords() {
               ? `<div class="time-item">
                    <span>🏢</span>
                    <span class="time-label" onclick="editTimeModal('${dateKey}','checkin')">${record.checkin}</span>
+                   ${!record.memo?.checkin ? `<button class="add-memo-btn" onclick="editMemoModal('${dateKey}','checkin')" title="메모 추가">+</button>` : ''}
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkin')">×</button>
                  </div>
                  ${record.memo?.checkin 
@@ -1601,13 +1629,14 @@ function displayRecords() {
                         <div class="memo-text" onclick="editMemoModal('${dateKey}','checkin')">${record.memo.checkin}</div>
                       </div>` 
                    : ''}`
-              : '<div class="time-item"><span>🏢</span><span class="time-label empty-time">--:--</span></div>'}
+              : `<div class="time-item"><span>🏢</span><span class="time-label empty-time" onclick="editTimeModal('${dateKey}','checkin')">--:--</span></div>`}
           </div>
           <div class="time-group">
             ${record.checkout 
               ? `<div class="time-item">
                    <span>🏠</span>
                    <span class="time-label" onclick="editTimeModal('${dateKey}','checkout')">${record.checkout}</span>
+                   ${!record.memo?.checkout ? `<button class="add-memo-btn" onclick="editMemoModal('${dateKey}','checkout')" title="메모 추가">+</button>` : ''}
                    <button class="delete-btn" onclick="deleteRecord('${dateKey}','checkout')">×</button>
                  </div>
                  ${record.memo?.checkout 
@@ -1615,7 +1644,7 @@ function displayRecords() {
                         <div class="memo-text" onclick="editMemoModal('${dateKey}','checkout')">${record.memo.checkout}</div>
                       </div>` 
                    : ''}`
-              : '<div class="time-item"><span>🏠</span><span class="time-label empty-time">--:--</span></div>'}
+              : `<div class="time-item"><span>🏠</span><span class="time-label empty-time" onclick="editTimeModal('${dateKey}','checkout')">--:--</span></div>`}
           </div>
         </div>
       </div>

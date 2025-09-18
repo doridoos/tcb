@@ -1,8 +1,10 @@
-const CACHE_NAME = 'time-check-buddy-v2-1-3';
+const CACHE_NAME = 'time-check-buddy-v2-1-8';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg'
 ];
 
 // 서비스 워커 설치
